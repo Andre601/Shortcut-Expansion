@@ -34,7 +34,7 @@ public class Shortcut extends PlaceholderExpansion{
     
     public Shortcut(){
         if(folder.mkdirs())
-            PlaceholderAPIPlugin.getInstance().getLogger().info("[Shortener] Created shortcuts folder.");
+            PlaceholderAPIPlugin.getInstance().getLogger().info("[Shortcut] Created shortcuts folder.");
     }
     
     @Override

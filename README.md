@@ -15,4 +15,4 @@ All you need to do now is creating a TXT file in it and add whatever text and pl
 
 ## Where is this Useful?
 This expansion is useful for when you want to parse either multiple placeholders or some large text and you're limited by certain factors (i.e. a plugin limitation or similar).  
-It can also be useful as a workaround for cases where a plugin uses `{}` for own/internal placeholders and messes up other placeholders that use those brackets too.
+It can also be useful as a workaround for cases where a plugin uses `{}` for own/internal placeholders and messes up other placeholders that use those brackets too or for cases where you have placeholders in placeholders in placeholders (i.e. `%placeholder1_{placeholder2_{placeholder3}}%`) which PlaceholderAPI would be unable to parse properly.

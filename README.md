@@ -1,4 +1,12 @@
 # Shortcut
+
+<a href="https://discord.gg/6dazXp6" target="_blank">
+  <img alt="discord" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@2/assets/minimal/social/discord-singular_vector.svg" height="64" align="right">
+</a>
+<a href="https://app.revolt.chat/invite/74TpERXA" target="_blank">
+  <img alt="revolt" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@2/assets/minimal/social/revolt-singular_vector.svg" height="64" align="right">
+</a>
+
 The Shortcut expansion allows you to parse several placeholders and large text by providing them through TXT files.
 
 ## Syntax

@@ -28,11 +28,13 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
 import javax.annotation.Nonnull;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.StringJoiner;
 
 public class Shortcut extends PlaceholderExpansion{
     
@@ -72,7 +74,16 @@ public class Shortcut extends PlaceholderExpansion{
         
         String value;
         try{
-            value = String.join("\n", Files.readAllLines(file.toPath()));
+            BufferedReader reader = Files.newBufferedReader(file.toPath());
+            StringJoiner joiner = new StringJoiner("\n");
+            
+            String line;
+            while((line = reader.readLine()) != null){
+                joiner.add(line);
+            }
+            
+            reader.close();
+            value = joiner.toString();
         }catch(IOException ex){
             value = null;
         }

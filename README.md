@@ -40,4 +40,5 @@ The second argument is banana
 ```
 
 > **Note**  
-> Keep in mind that the placeholders start at 0, meaning that `{0}` is replaced with the first replacement, `{1}` with the second and so on.
+> - The nummerical placeholders are replaced before any placeholders from PlaceholderAPI
+> - Keep in mind that the placeholders start at 0, meaning that `{0}` is replaced with the first replacement, `{1}` with the second and so on.

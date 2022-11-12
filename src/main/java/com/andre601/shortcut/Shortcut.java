@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 public class Shortcut extends PlaceholderExpansion{
     
@@ -81,7 +82,7 @@ public class Shortcut extends PlaceholderExpansion{
         
         if(values.length > 1){
             MessageFormat format = new MessageFormat(value.replace("'", "''"));
-            value = format.format(values);
+            value = format.format(Arrays.copyOfRange(values, 1, values.length));
         }
         
         return PlaceholderAPI.setPlaceholders(player, value);

@@ -7,20 +7,37 @@
   <img alt="revolt" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@2/assets/minimal/social/revolt-singular_vector.svg" height="64" align="right">
 </a>
 
-The Shortcut expansion allows you to parse several placeholders and large text by providing them through TXT files.
-
-## Syntax
-The expansion has a very simple placeholder syntax:
-
-### `%shortcut_<file>%`
-`<file>` would be the name of the TXT file you want to use WITHOUT the `.txt` ending.
+The Shortcut expansion allows to take content from TXT files, parse placeholders in them and return the final value. Useful for parsing of larger strings or as a workaround for very nested placeholders.
 
 ## How to use
-You first need to download the expansion by using `/papi ecloud download shortcut` followed by `/papi reload`
+You first have to download the expansion from the eCloud. You can do so by running `/papi ecloud download shortcut` followed by `/papi reload` to register it.  
+This should create a `shortcut` folder located inside the `PlaceholderAPI` plugin folder.
 
-After that should you see a `shortcuts` folder within the `plugins/PlaceholderAPI/` directory. This is the place where you put your TXT files to use.  
-All you need to do now is creating a TXT file in it and add whatever text and placeholders you want to parse. After that just use the aforementioned [placeholder-syntax](#syntax) to get the parsed text.
+You can now add and create TXT files inside this folder and fill them with any text you like (including line breaks, [custom replacement placeholders](#custom-replacement-placeholders) and placeholders from other expansions).  
+Once you saved your changes can you just use the file name (Without its `.txt` extension) in the Shortcut placeholder and the expansion will get the text, parse placeholders and return the result.
 
-## Where is this Useful?
-This expansion is useful for when you want to parse either multiple placeholders or some large text and you're limited by certain factors (i.e. a plugin limitation or similar).  
-It can also be useful as a workaround for cases where a plugin uses `{}` for own/internal placeholders and messes up other placeholders that use those brackets too or for cases where you have placeholders in placeholders in placeholders (i.e. `%placeholder1_{placeholder2_{placeholder3}}%`) which PlaceholderAPI would be unable to parse properly.
+> **Note**  
+> Make sure to read the section below about [custom replacement placeholders](#custom-replacement-placeholders) and the required Placeholder syntax if you used them.
+
+## Custom replacement placeholders
+Since version 1.1.0 can you add custom replacements. These allow more dynamic TXT files through providing replacement values inside the placeholder itself.  
+You can insert replacements by using the `{n}` placeholder (`n` being a number starting at 0) in the TXT file's content, which will then be replaced by whatever replacement has been provided in the placeholder.
+
+Replacements are defined and separated using colons (`:`).
+
+### Example
+Assume we have a file called `example.txt` and filled it with the following content:  
+```
+This is an example displaying custom replacements!
+The first argument is {0}
+The second argument is {1}
+```
+Using the placeholder `%shortcut_example:apple:banana%` will turn it into:  
+```
+This is an example displaying custom replacements!
+The first argument is apple
+The second argument is banana
+```
+
+> **Note**  
+> Keep in mind that the placeholders start at 0, meaning that `{0}` is replaced with the first replacement, `{1}` with the second and so on.

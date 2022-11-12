@@ -18,8 +18,12 @@
 
 package com.andre601.shortcut;
 
+import com.andre601.shortcut.logger.LegacyLogger;
+import com.andre601.shortcut.logger.LoggerUtil;
+import com.andre601.shortcut.logger.NativeLogger;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import me.clip.placeholderapi.expansion.NMSVersion;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
@@ -27,14 +31,17 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 
 public class Shortcut extends PlaceholderExpansion{
     
     private final File folder = new File(PlaceholderAPIPlugin.getInstance().getDataFolder() + "/shortcuts/");
     
     public Shortcut(){
+        LoggerUtil logger = loadLogger();
+        
         if(folder.mkdirs())
-            PlaceholderAPIPlugin.getInstance().getLogger().info("[Shortcut] Created shortcuts folder.");
+            logger.info("Created shortcuts folder.");
     }
     
     @Override
@@ -54,7 +61,11 @@ public class Shortcut extends PlaceholderExpansion{
     
     @Override
     public String onRequest(OfflinePlayer player, @Nonnull String params){
-        File file = new File(folder, params.toLowerCase() + ".txt");
+        String[] values = params.split(":");
+        if(values.length <= 0)
+            return null;
+        
+        File file = new File(folder, values[0].toLowerCase() + ".txt");
         if(!file.exists())
             return null;
         
@@ -68,7 +79,18 @@ public class Shortcut extends PlaceholderExpansion{
         if(value == null)
             return null;
         
+        if(values.length > 1){
+            MessageFormat format = new MessageFormat(value.replace("'", "''"));
+            value = format.format(values);
+        }
+        
         return PlaceholderAPI.setPlaceholders(player, value);
     }
     
+    private LoggerUtil loadLogger(){
+        if(NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
+            return new NativeLogger(this);
+        
+        return new LegacyLogger();
+    }
 }

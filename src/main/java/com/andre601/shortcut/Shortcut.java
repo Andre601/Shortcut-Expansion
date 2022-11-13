@@ -41,7 +41,7 @@ import java.util.Map;
 public class Shortcut extends PlaceholderExpansion{
 
     private final File folder = new File(PlaceholderAPIPlugin.getInstance().getDataFolder() + "/shortcuts/");
-    private Map<String, String> cache;
+    private final Map<String, String> cache;
 
     public Shortcut(){
         LoggerUtil logger = loadLogger();
@@ -73,28 +73,33 @@ public class Shortcut extends PlaceholderExpansion{
         if(values.length <= 0)
             return null;
 
-        values[0] = values[0].toLowerCase();
+        String filename = values[0].toLowerCase();
         String rawText;
 
-        if(!cache.containsKey(values[0])){
-            File file = new File(folder, values[0] + ".txt");
+        if(!cache.containsKey(filename)){
+            File file = new File(folder, filename + ".txt");
             if(!file.exists())
                 return null;
+            
             try(BufferedReader reader = Files.newBufferedReader(file.toPath())){
                 StringJoiner joiner = new StringJoiner("\n");
                 String line;
+                
                 while((line = reader.readLine()) != null)
                     joiner.add(line);
+                
                 reader.close();
                 rawText = joiner.toString();
             }catch(IOException ex){
                 rawText = null;
             }
+            
             if(rawText == null || rawText.isEmpty())
                 return null;
-            cache.put(values[0], rawText);
+            
+            cache.put(filename, rawText);
         }else{
-            rawText = cache.get(values[0]);
+            rawText = cache.get(filename);
         }
 
         if(values.length > 1){

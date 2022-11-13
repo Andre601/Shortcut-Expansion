@@ -38,71 +38,66 @@ import java.util.StringJoiner;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Shortcut extends PlaceholderExpansion {
+public class Shortcut extends PlaceholderExpansion{
 
     private final File folder = new File(PlaceholderAPIPlugin.getInstance().getDataFolder() + "/shortcuts/");
-    private final Map<String, String> cache;
+    private Map<String, String> cache;
 
-    public Shortcut() {
+    public Shortcut(){
         LoggerUtil logger = loadLogger();
 
-        if (folder.mkdirs())
+        if(folder.mkdirs())
             logger.info("Created shortcuts folder.");
 
         cache = new HashMap<>();
     }
 
     @Override
-    public @Nonnull String getIdentifier() {
+    public @Nonnull String getIdentifier(){
         return "shortcut";
     }
 
     @Override
-    public @Nonnull String getAuthor() {
+    public @Nonnull String getAuthor(){
         return "Andre_601, Whitebrim";
     }
 
     @Override
-    public @Nonnull String getVersion() {
+    public @Nonnull String getVersion(){
         return "VERSION";
     }
 
     @Override
-    public String onRequest(OfflinePlayer player, @Nonnull String params) {
+    public String onRequest(OfflinePlayer player, @Nonnull String params){
         String[] values = params.split(":");
-        if (values.length <= 0)
+        if(values.length <= 0)
             return null;
 
         values[0] = values[0].toLowerCase();
         String rawText;
 
-        if (!cache.containsKey(values[0])) {
+        if(!cache.containsKey(values[0])){
             File file = new File(folder, values[0] + ".txt");
-            if (!file.exists())
+            if(!file.exists())
                 return null;
-
-            try (BufferedReader reader = Files.newBufferedReader(file.toPath())) {
+            try(BufferedReader reader = Files.newBufferedReader(file.toPath())){
                 StringJoiner joiner = new StringJoiner("\n");
-
                 String line;
-                while ((line = reader.readLine()) != null)
+                while((line = reader.readLine()) != null)
                     joiner.add(line);
-
                 reader.close();
                 rawText = joiner.toString();
-            } catch (IOException ex) {
+            }catch(IOException ex){
                 rawText = null;
             }
-
-            if (rawText == null || rawText.isEmpty())
+            if(rawText == null || rawText.isEmpty())
                 return null;
-
             cache.put(values[0], rawText);
-        } else {
+        }else{
             rawText = cache.get(values[0]);
         }
 
-        if (values.length > 1) {
+        if(values.length > 1){
             MessageFormat format = new MessageFormat(rawText.replace("'", "''"));
             rawText = format.format(Arrays.copyOfRange(values, 1, values.length));
         }
@@ -110,8 +105,8 @@ public class Shortcut extends PlaceholderExpansion {
         return PlaceholderAPI.setPlaceholders(player, rawText);
     }
 
-    private LoggerUtil loadLogger() {
-        if (NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
+    private LoggerUtil loadLogger(){
+        if(NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
             return new NativeLogger(this);
 
         return new LegacyLogger();

@@ -73,14 +73,12 @@ public class Shortcut extends PlaceholderExpansion{
             return null;
         
         String value;
-        try{
-            BufferedReader reader = Files.newBufferedReader(file.toPath());
+        try(BufferedReader reader = Files.newBufferedReader(file.toPath())){
             StringJoiner joiner = new StringJoiner("\n");
             
             String line;
-            while((line = reader.readLine()) != null){
+            while((line = reader.readLine()) != null)
                 joiner.add(line);
-            }
             
             reader.close();
             value = joiner.toString();
@@ -88,7 +86,7 @@ public class Shortcut extends PlaceholderExpansion{
             value = null;
         }
         
-        if(value == null)
+        if(value == null || value.isEmpty())
             return null;
         
         if(values.length > 1){

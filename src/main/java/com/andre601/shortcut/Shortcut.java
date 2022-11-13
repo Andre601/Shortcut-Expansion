@@ -35,72 +35,85 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.StringJoiner;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Shortcut extends PlaceholderExpansion{
-    
+public class Shortcut extends PlaceholderExpansion {
+
     private final File folder = new File(PlaceholderAPIPlugin.getInstance().getDataFolder() + "/shortcuts/");
-    
-    public Shortcut(){
+    private final Map<String, String> cache;
+
+    public Shortcut() {
         LoggerUtil logger = loadLogger();
-        
-        if(folder.mkdirs())
+
+        if (folder.mkdirs())
             logger.info("Created shortcuts folder.");
+
+        cache = new HashMap<>();
     }
-    
+
     @Override
-    public @Nonnull String getIdentifier(){
+    public @Nonnull String getIdentifier() {
         return "shortcut";
     }
-    
+
     @Override
-    public @Nonnull String getAuthor(){
-        return "Andre_601";
+    public @Nonnull String getAuthor() {
+        return "Andre_601, Whitebrim";
     }
-    
+
     @Override
-    public @Nonnull String getVersion(){
+    public @Nonnull String getVersion() {
         return "VERSION";
     }
-    
+
     @Override
-    public String onRequest(OfflinePlayer player, @Nonnull String params){
+    public String onRequest(OfflinePlayer player, @Nonnull String params) {
         String[] values = params.split(":");
-        if(values.length <= 0)
+        if (values.length <= 0)
             return null;
-        
-        File file = new File(folder, values[0].toLowerCase() + ".txt");
-        if(!file.exists())
-            return null;
-        
-        String value;
-        try(BufferedReader reader = Files.newBufferedReader(file.toPath())){
-            StringJoiner joiner = new StringJoiner("\n");
-            
-            String line;
-            while((line = reader.readLine()) != null)
-                joiner.add(line);
-            
-            reader.close();
-            value = joiner.toString();
-        }catch(IOException ex){
-            value = null;
+
+        values[0] = values[0].toLowerCase();
+        String rawText;
+
+        if (!cache.containsKey(values[0])) {
+            File file = new File(folder, values[0] + ".txt");
+            if (!file.exists())
+                return null;
+
+            try (BufferedReader reader = Files.newBufferedReader(file.toPath())) {
+                StringJoiner joiner = new StringJoiner("\n");
+
+                String line;
+                while ((line = reader.readLine()) != null)
+                    joiner.add(line);
+
+                reader.close();
+                rawText = joiner.toString();
+            } catch (IOException ex) {
+                rawText = null;
+            }
+
+            if (rawText == null || rawText.isEmpty())
+                return null;
+
+            cache.put(values[0], rawText);
+        } else {
+            rawText = cache.get(values[0]);
         }
-        
-        if(value == null || value.isEmpty())
-            return null;
-        
-        if(values.length > 1){
-            MessageFormat format = new MessageFormat(value.replace("'", "''"));
-            value = format.format(Arrays.copyOfRange(values, 1, values.length));
+
+        if (values.length > 1) {
+            MessageFormat format = new MessageFormat(rawText.replace("'", "''"));
+            rawText = format.format(Arrays.copyOfRange(values, 1, values.length));
         }
-        
-        return PlaceholderAPI.setPlaceholders(player, value);
+
+        return PlaceholderAPI.setPlaceholders(player, rawText);
     }
-    
-    private LoggerUtil loadLogger(){
-        if(NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
+
+    private LoggerUtil loadLogger() {
+        if (NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
             return new NativeLogger(this);
-        
+
         return new LegacyLogger();
     }
 }

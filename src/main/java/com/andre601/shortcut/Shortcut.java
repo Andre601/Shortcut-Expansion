@@ -23,6 +23,7 @@ import com.andre601.shortcut.logger.LoggerUtil;
 import com.andre601.shortcut.logger.NativeLogger;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import me.clip.placeholderapi.expansion.Cacheable;
 import me.clip.placeholderapi.expansion.NMSVersion;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
@@ -32,16 +33,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Shortcut extends PlaceholderExpansion{
+public class Shortcut extends PlaceholderExpansion implements Cacheable{
 
     private final File folder = new File(PlaceholderAPIPlugin.getInstance().getDataFolder() + "/shortcuts/");
     private final Map<String, String> cache;
+    private final Pattern replacementPattern = Pattern.compile("\\{(\\d+)}");
 
     public Shortcut(){
         LoggerUtil logger = loadLogger();
@@ -66,11 +69,16 @@ public class Shortcut extends PlaceholderExpansion{
     public @Nonnull String getVersion(){
         return "VERSION";
     }
+    
+    @Override
+    public void clear(){
+        cache.clear();
+    }
 
     @Override
     public String onRequest(OfflinePlayer player, @Nonnull String params){
         String[] values = params.split(":");
-        if(values.length <= 0)
+        if(values.length == 0)
             return null;
 
         String filename = values[0].toLowerCase();
@@ -101,13 +109,39 @@ public class Shortcut extends PlaceholderExpansion{
         }else{
             rawText = cache.get(filename);
         }
-
-        if(values.length > 1){
-            MessageFormat format = new MessageFormat(rawText.replace("'", "''"));
-            rawText = format.format(Arrays.copyOfRange(values, 1, values.length));
+        
+        return parseReplacements(player, rawText, Arrays.copyOfRange(values, 1, values.length));
+    }
+    
+    private String parseReplacements(OfflinePlayer player, String text, String[] values){
+        if(values.length == 0)
+            return PlaceholderAPI.setPlaceholders(player, text);
+        
+        Matcher replacementMatcher = replacementPattern.matcher(text);
+        String newText = text;
+        
+        if(replacementMatcher.find()){
+            StringBuffer buffer = new StringBuffer();
+            
+            do{
+                int index;
+                try{
+                    index = Integer.parseInt(replacementMatcher.group(1));
+                }catch(NumberFormatException ex){
+                    continue;
+                }
+                
+                if(index < 0 || (index + 1) > values.length)
+                    continue;
+                
+                replacementMatcher.appendReplacement(buffer, values[index]);
+            }while(replacementMatcher.find());
+            
+            replacementMatcher.appendTail(buffer);
+            newText = buffer.toString();
         }
-
-        return PlaceholderAPI.setPlaceholders(player, rawText);
+        
+        return PlaceholderAPI.setPlaceholders(player, newText);
     }
 
     private LoggerUtil loadLogger(){

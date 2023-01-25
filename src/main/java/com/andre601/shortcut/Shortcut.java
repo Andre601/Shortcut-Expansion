@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
             rawText = cache.get(filename);
         }
         
-        return parseReplacements(player, rawText, values);
+        return parseReplacements(player, rawText, Arrays.copyOfRange(values, 1, values.length));
     }
     
     private String parseReplacements(OfflinePlayer player, String text, String[] values){
@@ -130,7 +131,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
                     continue;
                 }
                 
-                if(index < 0 || index > (values.length - 1))
+                if(index < 0 || (index + 1) > values.length)
                     continue;
                 
                 replacementMatcher.appendReplacement(buffer, values[index]);

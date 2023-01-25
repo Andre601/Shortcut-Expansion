@@ -114,7 +114,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
     }
     
     private String parseReplacements(OfflinePlayer player, String text, String[] values){
-        if(values.length == 1)
+        if(values.length == 0)
             return PlaceholderAPI.setPlaceholders(player, text);
         
         Matcher replacementMatcher = replacementPattern.matcher(text);

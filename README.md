@@ -11,12 +11,12 @@ The Shortcut expansion allows to take content from TXT files, parse placeholders
 
 ## How to use
 You first have to download the expansion from the eCloud. You can do so by running `/papi ecloud download shortcut` followed by `/papi reload` to register it.  
-This should create a `shortcut` folder located inside the `PlaceholderAPI` plugin folder.
+This should create a `shortcuts` folder located inside the `PlaceholderAPI` plugin folder.
 
 You can now add and create TXT files inside this folder and fill them with any text you like (including line breaks, [custom replacement placeholders](#custom-replacement-placeholders) and placeholders from other expansions).  
 Once you saved your changes can you just use the file name (Without its `.txt` extension) in the Shortcut placeholder and the expansion will get the text, parse placeholders and return the result.
 
-> **Note**  
+> [!NOTE]  
 > Make sure to read the section below about [custom replacement placeholders](#custom-replacement-placeholders) and the required Placeholder syntax if you used them.
 
 ## Custom replacement placeholders
@@ -39,6 +39,6 @@ The first argument is apple
 The second argument is banana
 ```
 
-> **Note**  
+> [!NOTE]  
 > - The nummerical placeholders are replaced before any placeholders from PlaceholderAPI
 > - Keep in mind that the placeholders start at 0, meaning that `{0}` is replaced with the first replacement, `{1}` with the second and so on.

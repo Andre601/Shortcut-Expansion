@@ -20,4 +20,6 @@ package com.andre601.shortcut.logger;
 
 public interface LoggerUtil{
     void info(String msg);
+    
+    void warn(String msg);
 }

@@ -32,4 +32,9 @@ public class NativeLogger implements LoggerUtil{
     public void info(String msg){
         this.instance.info(msg);
     }
+    
+    @Override
+    public void warn(String msg){
+        this.instance.warning(msg);
+    }
 }

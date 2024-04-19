@@ -34,4 +34,9 @@ public class LegacyLogger implements LoggerUtil{
     public void info(String msg){
         logger.info("[Shortcut] " + msg);
     }
+    
+    @Override
+    public void warn(String msg){
+        logger.warning(msg);
+    }
 }

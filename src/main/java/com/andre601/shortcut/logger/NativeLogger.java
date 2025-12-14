@@ -20,7 +20,9 @@ package com.andre601.shortcut.logger;
 
 import com.andre601.shortcut.Shortcut;
 
-public class NativeLogger implements LoggerUtil{
+import java.util.logging.Level;
+
+public class NativeLogger implements LoggerWrapper{
     
     private final Shortcut instance;
     
@@ -34,7 +36,7 @@ public class NativeLogger implements LoggerUtil{
     }
     
     @Override
-    public void warn(String msg){
-        this.instance.warning(msg);
+    public void warn(String msg, Exception ex){
+        this.instance.log(Level.WARNING, msg, ex);
     }
 }

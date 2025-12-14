@@ -18,8 +18,8 @@
 
 package com.andre601.shortcut.logger;
 
-public interface LoggerUtil{
+public interface LoggerWrapper{
     void info(String msg);
     
-    void warn(String msg);
+    void warn(String msg, Exception ex);
 }

@@ -20,9 +20,10 @@ package com.andre601.shortcut.logger;
 
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LegacyLogger implements LoggerUtil{
+public class LegacyLogger implements LoggerWrapper{
     
     private final Logger logger;
     
@@ -36,7 +37,7 @@ public class LegacyLogger implements LoggerUtil{
     }
     
     @Override
-    public void warn(String msg){
-        logger.warning(msg);
+    public void warn(String msg, Exception ex){
+        logger.log(Level.WARNING, "[Shortcut] " + msg, ex);
     }
 }

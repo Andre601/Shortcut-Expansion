@@ -19,7 +19,7 @@
 package com.andre601.shortcut;
 
 import com.andre601.shortcut.logger.LegacyLogger;
-import com.andre601.shortcut.logger.LoggerUtil;
+import com.andre601.shortcut.logger.LoggerWrapper;
 import com.andre601.shortcut.logger.NativeLogger;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -35,10 +35,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.StringJoiner;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,7 +52,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
         .build();
     private final Pattern replacementPattern = Pattern.compile("\\{(\\d+)}");
     
-    private final LoggerUtil logger;
+    private final LoggerWrapper logger;
     
     private LastLog lastLog = null;
 
@@ -74,7 +75,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
 
     @Override
     public @Nonnull String getVersion(){
-        return "VERSION";
+        return "1.4.0";
     }
     
     @Override
@@ -86,17 +87,22 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
     public String onRequest(OfflinePlayer player, @Nonnull String params){
         String[] values = params.split(":");
         if(values.length == 0)
-            return null;
+            return "ERR: Invalid Placeholder pattern received!";
 
         String filename = values[0] + (values[0].toLowerCase(Locale.ROOT).endsWith(".txt") ? "" : ".txt");
         
         String rawText;
         
         try{
+            Path path = Paths.get(folder.getName(), filename).normalize();
+            if(!path.startsWith("shortcuts" + File.separator)){
+                return "ERR: Invalid File Path!";
+            }
+            
             rawText = cache.get(filename.toLowerCase(Locale.ROOT), () -> {
                 File file = new File(folder, filename);
                 if(!file.exists())
-                    return null;
+                    return "ERR: No file with name " + filename + " exists!";
                 
                 try(BufferedReader reader = Files.newBufferedReader(file.toPath())){
                     StringJoiner joiner = new StringJoiner("\n");
@@ -105,20 +111,19 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
                     while((line = reader.readLine()) != null)
                         joiner.add(line);
                     
-                    reader.close();
                     return joiner.toString();
                 }catch(IOException ex){
-                    sendCachedWarn("Encountered IOException while reading file " + file.getName() + "!");
-                    return null;
+                    sendCachedWarn("Encountered IOException while reading file " + file.getName() + "!", ex);
+                    return "ERR: IOException on file read: " + ex.getMessage();
                 }
             });
-        }catch(ExecutionException ex){
-            sendCachedWarn("Encountered ExecutionException while getting content of file " + filename + "!");
-            return null;
+        }catch(Exception ex){
+            sendCachedWarn("Encountered an Exception while handling input " + filename + "!", ex);
+            return "ERR: Exception during Cache get: " + ex.getMessage();
         }
         
         if(rawText == null)
-            return null;
+            return "ERR: No text was retrieved from file " + filename + "!";
         
         if(rawText.isEmpty())
             return rawText;
@@ -139,7 +144,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
         String newText = text;
         
         if(replacementMatcher.find()){
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             
             do{
                 int index;
@@ -162,19 +167,19 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
         return PlaceholderAPI.setPlaceholders(player, newText);
     }
 
-    private LoggerUtil loadLogger(){
+    private LoggerWrapper loadLogger(){
         if(NMSVersion.getVersion("v1_18_R1") != NMSVersion.UNKNOWN)
             return new NativeLogger(this);
 
         return new LegacyLogger();
     }
     
-    private void sendCachedWarn(String msg){
+    private void sendCachedWarn(String msg, Exception ex){
         if(lastLog != null && !lastLog.isExpired())
             return;
         
         lastLog = new LastLog();
-        logger.warn(msg);
+        logger.warn(msg, ex);
     }
     
     private static class LastLog{

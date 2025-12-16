@@ -94,8 +94,8 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
         String rawText;
         
         try{
-            Path path = Paths.get(filename).normalize();
-            if(!path.startsWith("shortcuts/")){
+            Path path = Paths.get(folder.getName(), filename).normalize();
+            if(!path.startsWith("shortcuts" + File.separator)){
                 return "ERR: Invalid File Path!";
             }
             
@@ -144,7 +144,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
         String newText = text;
         
         if(replacementMatcher.find()){
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             
             do{
                 int index;

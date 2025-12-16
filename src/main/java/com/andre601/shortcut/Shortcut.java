@@ -75,7 +75,7 @@ public class Shortcut extends PlaceholderExpansion implements Cacheable{
 
     @Override
     public @Nonnull String getVersion(){
-        return "VERSION";
+        return "1.4.0";
     }
     
     @Override
